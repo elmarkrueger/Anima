@@ -302,173 +302,90 @@ class AnimagineXL4_Prompt_Styler:
             "cut off, censored, mosaic censoring"
         )
         return f"{self.OFFICIAL_NEGATIVE}, {enhanced_additions}"
-
-
-    # Character features
-    HAIR_LENGTHS = ["None", "short hair", "medium hair", "long hair", "very long hair", "absurdly long hair"]
-    HAIR_STYLES = [
-        "None", "pony tail", "twintails", "braid", "french braid", "crown braid", 
-        "twin braids", "hair bun", "double bun", "drill hair", "ahoge", "bob cut", 
-        "hime cut", "pixie cut", "messy hair", "straight hair", "wavy hair", "curly hair", 
-        "blunt bangs", "swept bangs", "hair over one eye", "hair over eyes"
-    ]
-    HAIR_COLORS = [
-        "None", "blonde hair", "black hair", "brown hair", "red hair", "blue hair", 
-        "green hair", "pink hair", "purple hair", "white hair", "silver hair", "grey hair", 
-        "orange hair", "multicolored hair", "two-tone hair", "gradient hair"
-    ]
-    EYE_COLORS = [
-        "None", "blue eyes", "red eyes", "green eyes", "yellow eyes", "purple eyes", 
-        "brown eyes", "pink eyes", "grey eyes", "black eyes", "aqua eyes", "heterochromia", "gradient eyes"
-    ]
-    EXPRESSIONS = [
-        "None", "smile", "grin", "smirk", "laughing", "frown", "angry", "annoyed", 
-        "sad", "crying", "tears", "blush", "embarrassed", "shy", "nervous", "scared", 
-        "surprised", "shocked", "sleepy", "yawn", "bored", "expressionless", "neutral expression", 
-        "wink", "one eye closed", "tongue out", "pout", "ahegao"
-    ]
-    SKIN_TYPES = ["None", "pale skin", "fair skin", "tanned skin", "dark skin", "darker skin"]
     
-    # Attire
-    ATTIRE_CATEGORIES = [
-        "None",
-        "school uniform", "sailor dress", "blazer", "gym uniform", "swimsuit", "school swimsuit", "bikini",
-        "maid", "waitress", "nurse", "police", "military", "kimono", "yukata", "miko", "cheongsam",
-        "casual", "sportswear", "pajamas", "lingerie", "armor", "fantasy", "sci-fi suit", "plugsuit",
-        "dress", "suit", "tuxedo", "hoodie", "jacket", "sweater", "t-shirt", "shirt", "blouse",
-        "skirt", "shorts", "pants", "jeans", "thighhighs", "pantyhose", "kneehighs"
-    ]
-
-    # Environment
-    LOCATIONS_INDOOR = [
-        "None", "bedroom", "living room", "kitchen", "bathroom", "classroom", "library", "office", 
-        "laboratory", "store", "supermarket", "cafe", "restaurant", "bar", "gym", "hospital", 
-        "dungeon", "castle", "temple", "shrine"
-    ]
-    LOCATIONS_OUTDOOR = [
-        "None", "street", "city", "cityscape", "ally", "park", "garden", "forest", "woods", 
-        "beach", "ocean", "sea", "mountains", "field", "meadow", "flower field", "ruins", 
-        "rooftop", "balcony", "train station", "bus stop"
-    ]
-    TIME_OF_DAY = ["None", "day", "morning", "afternoon", "evening", "sunset", "sunrise", "night", "midnight", "dusk", "dawn"]
-    WEATHER = ["None", "sunny", "cloudy", "rain", "raining", "snow", "snowing", "fog", "mist", "windy", "storm", "lightning"]
-    LIGHTING = ["None", "sunlight", "moonlight", "natural light", "cinematic lighting", "volumetric lighting", "god rays", "rim lighting", "backlighting", "soft lighting", "hard lighting", "neon lights", "firelight", "candlelight"]
-
-    def __init__(self):
-        pass
-
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                # Core prompt input
-                "simple_prompt": ("STRING", {
-                    "multiline": True, 
-                    "default": "Enter your simple prompt here...", 
-                    "dynamicPrompts": False
-                }),
-            },
-            "optional": {
-                # Character Builder Section
-                "gender": (cls.SUBJECT_COUNTS, {"default": "1girl"}),
-                "hair_style": (cls.HAIR_STYLES, {"default": "None"}),
-                "hair_length": (cls.HAIR_LENGTHS, {"default": "None"}),
-                "hair_color": (cls.HAIR_COLORS, {"default": "None"}),
-                "eye_color": (cls.EYE_COLORS, {"default": "None"}),
-                "expression": (cls.EXPRESSIONS, {"default": "None"}),
-                "skin_type": (cls.SKIN_TYPES, {"default": "None"}),
-                "attire": (cls.ATTIRE_CATEGORIES, {"default": "None"}),
-                
-                # Scene Builder Section
-                "location_type": (["None", "Indoor", "Outdoor"], {"default": "None"}),
-                "location_indoor": (cls.LOCATIONS_INDOOR, {"default": "None"}),
-                "location_outdoor": (cls.LOCATIONS_OUTDOOR, {"default": "None"}),
-                "time_of_day": (cls.TIME_OF_DAY, {"default": "None"}),
-                "weather": (cls.WEATHER, {"default": "None"}),
-                "lighting": (cls.LIGHTING, {"default": "None"}),
-                
-                # Character identification (Tag Ordering: comes first)
-                "character_name": ("STRING", {
-                    "default": "",
-                    "placeholder": "e.g., hatsune miku (optional)"
-                }),
-                "series_name": ("STRING", {
-                    "default": "",
-                    "placeholder": "e.g., vocaloid (optional)"
-                }),
-                
-                # Artist and Style
-                "artist_tag": ("STRING", {
-                    "default": "",
-                    "placeholder": "e.g., ciloranko"
-                }),
-                "art_style": (cls.ART_STYLES, {"default": "None"}),
-                "year_style": (cls.YEAR_STYLES, {"default": "2024-2025 (Modern)"}),
-                
-                # Composition
-                "pose": (cls.POSES, {"default": "None"}),
-                "framing": (cls.FRAMING, {"default": "None"}),
-                
-                # Controls
-                "rating": (cls.RATING_TAGS, {"default": "safe"}),
-                "add_quality_tags": ("BOOLEAN", {"default": True}),
-                "enhance_negative": ("BOOLEAN", {"default": False}),
-                "additional_positive": ("STRING", {
-                    "multiline": True,
-                    "default": "",
-                    "placeholder": "Additional custom tags"
-                }),
-            },
-        }
-
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("positive_prompt", "negative_prompt")
-    FUNCTION = "build_detailed_prompts"
-    CATEGORY = "Animagine/Prompting"
-    
-    # ... existing helper methods (_clean_tag, _clean_prompt, etc.) ...
-    
-    def build_detailed_prompts(
+    def build_optimized_prompts(
         self,
         simple_prompt,
-        gender="1girl",
-        hair_style="None",
-        hair_length="None",
-        hair_color="None",
-        eye_color="None",
-        expression="None",
-        skin_type="None",
-        attire="None",
-        location_type="None",
-        location_indoor="None",
-        location_outdoor="None",
-        time_of_day="None",
-        weather="None",
-        lighting="None",
+        subject_count="1girl",
         character_name="",
         series_name="",
         artist_tag="",
-        art_style="None",
-        year_style="2024-2025 (Modern)",
         pose="None",
         framing="None",
+        background="None",
+        art_style="None",
         rating="safe",
+        year_style="2024-2025 (Modern)",
         add_quality_tags=True,
         enhance_negative=False,
         additional_positive="",
         additional_negative="",
-        # These are kept for backward compatibility if called with old args, though INPUT_TYPES changed
-        subject_count=None, 
-        background=None,
     ):
-        # Handle backward compatibility mapping if needed
-        # But this is a new node class so strictly we don't need it, 
-        # however we are modifying the existing Styler class in-place to Extend it.
-        # Wait, if I modify Styler in place, I break existing workflows that use 'subject_count'.
-        # The user asked to "extend" it. I should probably ADD A NEW CLASS instead of replacing Styler.
-        # Replacing Styler with new inputs breaks inputs for users who update.
-        # So I will revert the change to Styler and create AnimagineXL4_Character_Factory
-        pass
+        """Build optimized prompts following Cagliostro Lab tag ordering."""
+        parts = []
+        
+        # 1. Subject count
+        if subject_count != "None":
+            parts.append(subject_count)
+        
+        # 2. Character name
+        if character_name:
+            parts.append(self._clean_prompt(character_name))
+        
+        # 3. Series name
+        if series_name:
+            parts.append(self._clean_prompt(series_name))
+        
+        # 4. Artist tag (early position)
+        if artist_tag:
+            parts.append(self._clean_prompt(artist_tag))
+        
+        # 5. General tags (user prompt)
+        if simple_prompt:
+            cleaned = self._clean_prompt(simple_prompt)
+            if cleaned and cleaned != "Enter your simple prompt here...\n(features, clothing, actions, expressions, etc.)":
+                parts.append(cleaned)
+        
+        # Composition
+        if pose != "None":
+            parts.append(pose)
+        if framing != "None":
+            parts.append(framing)
+        if background != "None":
+            parts.append(background)
+        if art_style != "None":
+            parts.append(art_style)
+        
+        # Additional positive tags
+        if additional_positive:
+            parts.append(self._clean_prompt(additional_positive))
+        
+        # 6. Rating
+        if rating != "None":
+            parts.append(rating)
+        
+        # Year tags
+        year_tags = self._get_year_tags(year_style)
+        if year_tags:
+            parts.append(year_tags)
+        
+        # 7. Quality tags at the END
+        if add_quality_tags:
+            parts.append(self.QUALITY_SUFFIX)
+        
+        final_positive = ", ".join(parts)
+        
+        # Negative prompt
+        if enhance_negative:
+            final_negative = self._get_enhanced_negative()
+        else:
+            final_negative = self.OFFICIAL_NEGATIVE
+        
+        if additional_negative:
+            final_negative = f"{final_negative}, {self._clean_prompt(additional_negative)}"
+        
+        return (final_positive, final_negative)
+
 
 class AnimagineXL4_Character_Factory(AnimagineXL4_Prompt_Styler):
     """
@@ -654,6 +571,432 @@ class AnimagineXL4_Character_Factory(AnimagineXL4_Prompt_Styler):
 
 
 
+class AnimagineXL4_Creature_Styler:
+    """
+    Specialized Creature & Style Generator for Animagine XL 4.0
+    Create cyborgs, robots, monsters, and apply unique visual aesthetics.
+    """
+    
+    QUALITY_SUFFIX = "masterpiece, high score, great score, absurdres"
+    OFFICIAL_NEGATIVE = (
+        "lowres, bad anatomy, bad hands, text, error, missing finger, "
+        "extra digits, fewer digits, cropped, worst quality, low quality, "
+        "low score, bad score, average score, signature, watermark, username, blurry"
+    )
+    
+    # === CREATURE TYPES ===
+    CREATURE_TYPES = [
+        "None",
+        # Humanoid
+        "1girl", "1boy", "1other",
+        # Mechanical
+        "android", "cyborg", "robot", "mecha", "mecha musume", "gynoid", "combat android",
+        "humanoid robot", "battle android", "robot girl", "robot boy",
+        # Monsters & Creatures
+        "monster", "monster girl", "monster boy", "creature", "beast", "chimera",
+        "demon", "demon girl", "succubus", "incubus", "devil",
+        "angel", "fallen angel", "cherub", "seraph",
+        "vampire", "vampire girl", "nosferatu",
+        "zombie", "undead", "lich", "skeleton", "revenant",
+        "werewolf", "wolfgirl", "kemonomimi", "nekomimi", "kitsune", "inumimi",
+        "ghost", "wraith", "specter", "phantom", "spirit",
+        "alien", "extraterrestrial", "xenomorph-like",
+        "slime", "slime girl", "dryad", "nymph", "fairy", "pixie",
+        "dragon", "dragonkin", "half-dragon", "lamia", "harpy", "centaur", "mermaid",
+        "eldritch", "lovecraftian", "cosmic horror", "aberration",
+        "golem", "elemental", "fire elemental", "water elemental", "shadow creature",
+    ]
+    
+    # === MECHANICAL FEATURES (Cyborgs/Robots) ===
+    MECHANICAL_FEATURES = [
+        "None",
+        "mechanical arms", "mechanical legs", "mechanical body", "mechanical wings",
+        "robotic limbs", "robotic eyes", "robotic tail", "cybernetic implants",
+        "cyber eye", "glowing eyes", "scanner visor", "targeting reticle",
+        "exposed machinery", "visible gears", "visible circuits", "wire frame",
+        "chrome body", "metallic skin", "polished metal", "brushed steel",
+        "LED lights", "glowing panels", "holographic displays", "data streams",
+        "cables", "wires", "tubes", "hydraulics", "pistons",
+        "antenna", "sensor array", "satellite dish", "radar dome",
+        "energy core", "power cell", "reactor core", "glowing chest",
+        "exhaust vents", "cooling fans", "steam vents", "heat sinks",
+        "weapon systems", "built-in weapons", "arm cannon", "laser emitter",
+        "force field", "energy shield", "barrier generator",
+        "damaged machinery", "battle damage", "rust", "patina", "aged metal",
+        "neon accents", "light trails", "energy lines", "circuit patterns",
+    ]
+    
+    # === MONSTER FEATURES ===
+    MONSTER_FEATURES = [
+        "None",
+        # Body Parts
+        "horns", "demon horns", "ram horns", "dragon horns", "antlers",
+        "wings", "demon wings", "bat wings", "angel wings", "feathered wings", "insect wings", "mechanical wings",
+        "tail", "demon tail", "dragon tail", "cat tail", "wolf tail", "snake tail", "scorpion tail",
+        "claws", "sharp claws", "talons", "elongated nails",
+        "fangs", "sharp teeth", "multiple rows of teeth", "tusks",
+        "forked tongue", "long tongue", "serpent tongue",
+        "pointed ears", "elf ears", "long ears", "bat ears",
+        "multiple eyes", "third eye", "compound eyes", "no eyes", "glowing eyes", "heterochromia",
+        "multiple arms", "multiple limbs", "extra arms", "tentacles", "tentacle hair",
+        "scales", "dragon scales", "snake scales", "armored skin",
+        "fur", "fluffy", "fuzzy", "feathers", "shell", "exoskeleton", "carapace",
+        "spikes", "bone spikes", "dorsal spines", "quills",
+        "aura", "dark aura", "fire aura", "energy aura", "miasma", "shadow tendrils",
+        "halo", "broken halo", "dark halo", "multiple halos",
+        "ethereal", "translucent body", "ghostly", "spectral", "incorporeal",
+        "stitches", "scars", "exposed bone", "rotting flesh",
+        "unusual skin color", "pale skin", "grey skin", "blue skin", "green skin", "red skin", "purple skin",
+    ]
+    
+    # === VISUAL AESTHETICS/STYLES ===
+    VISUAL_STYLES = [
+        "None",
+        # Cyberpunk/Tech
+        "cyberpunk", "synthwave", "vaporwave", "retrowave", "outrun aesthetic",
+        "neon", "neon lights", "neon glow", "neon city", "neon signs",
+        "holographic", "iridescent", "chromatic", "prismatic",
+        "glitch art", "pixel glitch", "data moshing", "databend",
+        "matrix code", "digital rain", "binary", "circuit board aesthetic",
+        "wireframe", "low poly", "vector art", "geometric",
+        # Dark/Gothic
+        "dark fantasy", "gothic", "victorian gothic", "dark academia",
+        "eldritch", "lovecraftian", "cosmic horror", "body horror",
+        "macabre", "grim dark", "dark souls aesthetic", "bloodborne aesthetic",
+        "horror", "creepy", "unsettling", "nightmare fuel",
+        # Ethereal/Magical
+        "ethereal", "dreamy", "surreal", "otherworldly", "mystical",
+        "magical", "arcane", "occult", "witchy aesthetic",
+        "bioluminescent", "phosphorescent", "glowing", "radiant",
+        "celestial", "astral", "cosmic", "starry", "galaxy",
+        "aurora", "northern lights", "plasma", "energy",
+        # Industrial/Mechanical
+        "steampunk", "dieselpunk", "clockpunk", "atompunk",
+        "industrial", "brutalist", "utilitarian", "militaristic",
+        "post-apocalyptic", "wasteland", "rusted", "decayed",
+        "biopunk", "organic machinery", "biomechanical", "giger-esque",
+        # Artistic Styles
+        "art nouveau", "art deco", "ukiyo-e", "traditional japanese",
+        "impressionistic", "expressionistic", "surrealist", "abstract",
+        "minimalist", "maximalist", "baroque", "rococo",
+        "stained glass", "mosaic", "fresco", "mural",
+        # Color Themes
+        "monochrome", "high contrast", "desaturated", "oversaturated",
+        "warm colors", "cool colors", "pastel colors", "neon colors",
+        "color splash", "selective color", "duotone", "tritone",
+        # Lighting/Atmosphere
+        "dramatic lighting", "chiaroscuro", "tenebrism", "rim lighting",
+        "god rays", "crepuscular rays", "volumetric light", "atmospheric",
+        "foggy", "misty", "hazy", "smoky", "dusty particles",
+    ]
+    
+    # === ENVIRONMENTS ===
+    CREATURE_ENVIRONMENTS = [
+        "None",
+        # Tech/Sci-fi
+        "cyberpunk city", "neon-lit streets", "futuristic cityscape", "megacity",
+        "space station", "spaceship interior", "spacecraft bridge", "cryo chamber",
+        "server room", "data center", "laboratory", "research facility",
+        "factory", "assembly line", "manufacturing plant", "power plant",
+        "junkyard", "scrapyard", "robot graveyard", "tech wasteland",
+        # Dark/Horror
+        "dark forest", "dead forest", "corrupted forest", "haunted woods",
+        "graveyard", "cemetery", "crypt", "mausoleum", "catacombs",
+        "haunted mansion", "abandoned asylum", "ruined castle", "dark cathedral",
+        "hell", "hellscape", "inferno", "underworld", "abyss", "void",
+        "limbo", "purgatory", "spirit realm", "shadow realm",
+        # Fantasy
+        "enchanted forest", "fairy realm", "magical kingdom", "crystal cave",
+        "floating islands", "sky realm", "cloud city", "celestial palace",
+        "underwater kingdom", "ocean depths", "coral reef", "sunken ruins",
+        "volcanic lair", "dragon's den", "demon realm", "eldritch dimension",
+        # Wasteland/Post-Apocalyptic
+        "wasteland", "desert ruins", "nuclear wasteland", "post-apocalyptic city",
+        "overgrown ruins", "abandoned city", "flooded city", "frozen wasteland",
+    ]
+    
+    # === CLOTHING/ARMOR ===
+    CREATURE_ATTIRE = [
+        "None",
+        # Mechanical/Tech
+        "power armor", "exosuit", "mech suit", "combat armor", "tactical gear",
+        "plugsuit", "bodysuit", "latex suit", "rubber suit", "wetsuit",
+        "space suit", "pilot suit", "containment suit", "hazmat suit",
+        "cyberpunk outfit", "tech wear", "utility vest", "tactical harness",
+        "holographic clothing", "energy clothes", "hard light outfit",
+        # Monster/Fantasy
+        "dark armor", "demon armor", "corrupted armor", "bone armor", "chitin armor",
+        "eldritch robes", "cultist robes", "ritual garments", "ceremonial dress",
+        "tattered clothes", "ragged clothes", "bandages", "wrappings",
+        "chains", "shackles", "collar", "restraints",
+        "regal attire", "royal dress", "noble outfit", "aristocratic clothes",
+        "tribal outfit", "primitive clothes", "fur clothing", "leather armor",
+        "gothic dress", "victorian dress", "witch outfit", "dark priestess",
+        "angelic robes", "divine garments", "holy vestments", "celestial dress",
+        "naked", "nude", "minimal clothing", "strategic covering",
+    ]
+    
+    # === WEAPONS/ACCESSORIES ===
+    WEAPONS_ACCESSORIES = [
+        "None",
+        # Ranged
+        "laser gun", "plasma rifle", "energy weapon", "blaster", "ray gun",
+        "sniper rifle", "assault rifle", "submachine gun", "handgun", "revolver",
+        # Melee
+        "energy sword", "beam saber", "plasma blade", "laser blade",
+        "katana", "longsword", "greatsword", "dual blades", "dagger",
+        "scythe", "war scythe", "death scythe",
+        "axe", "battle axe", "halberd", "spear", "trident",
+        "claws", "gauntlets", "brass knuckles", "spiked fists",
+        # Magic/Fantasy
+        "staff", "magic staff", "wizard staff", "scepter", "wand",
+        "grimoire", "spellbook", "tome", "scroll",
+        "orb", "crystal ball", "magic orb", "soul gem",
+        # Accessories
+        "visor", "helmet", "mask", "gas mask", "oni mask", "skull mask",
+        "goggles", "cyber goggles", "steampunk goggles",
+        "headphones", "earpiece", "neural interface",
+        "cape", "cloak", "hooded cloak", "tattered cape",
+        "jewelry", "amulet", "pendant", "choker", "collar", "circlet", "crown", "tiara",
+    ]
+    
+    # === POSES/ACTIONS ===
+    CREATURE_POSES = [
+        "None",
+        "standing", "floating", "hovering", "levitating",
+        "sitting", "kneeling", "crouching", "lying down",
+        "walking", "running", "charging", "lunging",
+        "fighting stance", "battle stance", "combat pose", "action pose",
+        "attacking", "slashing", "shooting", "casting spell",
+        "defensive pose", "blocking", "guarding", "shielding",
+        "intimidating pose", "menacing", "looming", "towering over",
+        "transformation", "transforming", "emerging", "awakening",
+        "feeding", "hunting", "stalking", "prowling",
+        "flying", "soaring", "diving", "descending",
+        "screaming", "roaring", "howling", "shrieking",
+        "praying", "meditating", "channeling energy", "summoning",
+        "damaged", "injured", "wounded", "dying",
+        "powering up", "charging energy", "releasing energy", "energy burst",
+    ]
+    
+    # === FRAMING ===
+    FRAMING_OPTIONS = [
+        "None",
+        "portrait", "bust", "upper body", "cowboy shot", "full body",
+        "close-up", "extreme close-up", "face focus", "eye focus",
+        "from above", "from below", "from side", "from behind",
+        "dutch angle", "tilted frame", "dynamic angle",
+        "wide shot", "establishing shot", "panoramic",
+        "pov", "first person view", "over shoulder",
+        "symmetrical", "centered", "rule of thirds", "golden ratio",
+    ]
+    
+    # === RATINGS ===
+    RATING_TAGS = ["None", "safe", "sensitive", "nsfw", "explicit"]
+    
+    # === YEAR STYLES ===
+    YEAR_STYLES = [
+        "None",
+        "2024-2025 (Modern)",
+        "2020-2023 (Recent)",
+        "2015-2019 (Mid-Era)",
+        "2010-2014 (Classic)",
+    ]
+    
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "creature_type": (cls.CREATURE_TYPES, {"default": "cyborg"}),
+            },
+            "optional": {
+                # Visual Style
+                "visual_style": (cls.VISUAL_STYLES, {"default": "cyberpunk"}),
+                "secondary_style": (cls.VISUAL_STYLES, {"default": "None"}),
+                
+                # Creature Features
+                "mechanical_features": (cls.MECHANICAL_FEATURES, {"default": "None"}),
+                "secondary_mech_feature": (cls.MECHANICAL_FEATURES, {"default": "None"}),
+                "monster_features": (cls.MONSTER_FEATURES, {"default": "None"}),
+                "secondary_monster_feature": (cls.MONSTER_FEATURES, {"default": "None"}),
+                
+                # Appearance
+                "attire": (cls.CREATURE_ATTIRE, {"default": "None"}),
+                "weapon_accessory": (cls.WEAPONS_ACCESSORIES, {"default": "None"}),
+                
+                # Scene
+                "environment": (cls.CREATURE_ENVIRONMENTS, {"default": "None"}),
+                
+                # Composition
+                "pose": (cls.CREATURE_POSES, {"default": "None"}),
+                "framing": (cls.FRAMING_OPTIONS, {"default": "None"}),
+                
+                # Artist/Style Override
+                "artist_tag": ("STRING", {
+                    "default": "",
+                    "placeholder": "e.g., wlop, sakimichan, greg rutkowski"
+                }),
+                
+                # Custom Tags
+                "custom_features": ("STRING", {
+                    "multiline": True,
+                    "default": "",
+                    "placeholder": "Additional creature features..."
+                }),
+                "custom_scene": ("STRING", {
+                    "multiline": True,
+                    "default": "",
+                    "placeholder": "Additional scene details..."
+                }),
+                
+                # Controls
+                "year_style": (cls.YEAR_STYLES, {"default": "2024-2025 (Modern)"}),
+                "rating": (cls.RATING_TAGS, {"default": "safe"}),
+                "add_quality_tags": ("BOOLEAN", {"default": True}),
+                "enhance_negative": ("BOOLEAN", {"default": True}),
+            }
+        }
+    
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("positive_prompt", "negative_prompt")
+    FUNCTION = "generate_creature_prompt"
+    CATEGORY = "Animagine/Creatures"
+    
+    def _clean_tag(self, tag: str) -> str:
+        tag = tag.strip()
+        while tag.endswith(","):
+            tag = tag[:-1].strip()
+        while tag.startswith(","):
+            tag = tag[1:].strip()
+        return tag
+    
+    def _clean_prompt(self, prompt: str) -> str:
+        if not prompt:
+            return ""
+        prompt = " ".join(prompt.split())
+        prompt = prompt.replace(" ,", ",").replace(",  ", ", ").replace(",,", ",")
+        prompt = self._clean_tag(prompt)
+        return prompt
+    
+    def _get_year_tags(self, year_style: str) -> str:
+        year_mappings = {
+            "2024-2025 (Modern)": "year 2024, year 2025",
+            "2020-2023 (Recent)": "year 2020, year 2022, year 2023",
+            "2015-2019 (Mid-Era)": "year 2016, year 2018",
+            "2010-2014 (Classic)": "year 2011, year 2013",
+        }
+        return year_mappings.get(year_style, "")
+    
+    def _get_enhanced_negative(self) -> str:
+        creature_negative = (
+            "jpeg artifacts, compression artifacts, pixelated, "
+            "deformed, distorted, disfigured, mutation, mutated, "
+            "ugly, duplicate, morbid, out of frame, poorly drawn face, "
+            "poorly drawn hands, extra limbs, malformed limbs, "
+            "fused fingers, too many fingers, long neck, amateur, "
+            "poorly drawn, bad proportions, gross proportions, "
+            "cloned face, body out of frame, cut off, censored, "
+            "mosaic censoring, asymmetric, unfinished, draft"
+        )
+        return f"{self.OFFICIAL_NEGATIVE}, {creature_negative}"
+    
+    def generate_creature_prompt(
+        self,
+        creature_type,
+        visual_style="None",
+        secondary_style="None",
+        mechanical_features="None",
+        secondary_mech_feature="None",
+        monster_features="None",
+        secondary_monster_feature="None",
+        attire="None",
+        weapon_accessory="None",
+        environment="None",
+        pose="None",
+        framing="None",
+        artist_tag="",
+        custom_features="",
+        custom_scene="",
+        year_style="2024-2025 (Modern)",
+        rating="safe",
+        add_quality_tags=True,
+        enhance_negative=True,
+    ):
+        parts = []
+        
+        # 1. Creature Type (Subject)
+        if creature_type != "None":
+            parts.append(creature_type)
+        
+        # 2. Artist (Early position per guidelines)
+        if artist_tag:
+            parts.append(self._clean_prompt(artist_tag))
+        
+        # 3. Visual Styles
+        if visual_style != "None":
+            parts.append(visual_style)
+        if secondary_style != "None":
+            parts.append(secondary_style)
+        
+        # 4. Creature Features
+        if mechanical_features != "None":
+            parts.append(mechanical_features)
+        if secondary_mech_feature != "None":
+            parts.append(secondary_mech_feature)
+        if monster_features != "None":
+            parts.append(monster_features)
+        if secondary_monster_feature != "None":
+            parts.append(secondary_monster_feature)
+        
+        # 5. Custom Features
+        if custom_features:
+            parts.append(self._clean_prompt(custom_features))
+        
+        # 6. Attire & Accessories
+        if attire != "None":
+            parts.append(attire)
+        if weapon_accessory != "None":
+            parts.append(weapon_accessory)
+        
+        # 7. Composition
+        if pose != "None":
+            parts.append(pose)
+        if framing != "None":
+            parts.append(framing)
+        
+        # 8. Environment/Scene
+        if environment != "None":
+            parts.append(environment)
+        if custom_scene:
+            parts.append(self._clean_prompt(custom_scene))
+        
+        # 9. Rating
+        if rating != "None":
+            parts.append(rating)
+        
+        # 10. Year Style
+        year_tags = self._get_year_tags(year_style)
+        if year_tags:
+            parts.append(year_tags)
+        
+        # 11. Quality Tags (End)
+        if add_quality_tags:
+            parts.append(self.QUALITY_SUFFIX)
+        
+        final_positive = ", ".join(parts)
+        
+        # Negative Prompt
+        if enhance_negative:
+            final_negative = self._get_enhanced_negative()
+        else:
+            final_negative = self.OFFICIAL_NEGATIVE
+        
+        return (final_positive, final_negative)
+
+
 # Legacy node for backwards compatibility
 class AnimagineXL4_Prompt_Manager:
     """
@@ -728,9 +1071,13 @@ class AnimagineXL4_Prompt_Manager:
 NODE_CLASS_MAPPINGS = {
     "AnimagineXL4_Prompt_Styler": AnimagineXL4_Prompt_Styler,
     "AnimagineXL4_Prompt_Manager": AnimagineXL4_Prompt_Manager,
+    "AnimagineXL4_Character_Factory": AnimagineXL4_Character_Factory,
+    "AnimagineXL4_Creature_Styler": AnimagineXL4_Creature_Styler,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "AnimagineXL4_Prompt_Styler": "Animagine XL 4.0 Prompt Styler (Advanced)",
     "AnimagineXL4_Prompt_Manager": "Animagine XL 4.0 Prompt Manager (Simple)",
+    "AnimagineXL4_Character_Factory": "Animagine XL 4.0 Character Factory",
+    "AnimagineXL4_Creature_Styler": "Animagine XL 4.0 Creature Styler (Cyborg/Robot/Monster)",
 }

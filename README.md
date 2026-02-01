@@ -12,6 +12,7 @@ A custom node pack for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that
 - **Artist Tag Placement**: Correct early placement of artist tags (not at the end)
 - **Composition Helpers**: Dropdowns for poses, framing, backgrounds, and art styles
 - **Rating Tags**: Support for safe, sensitive, nsfw, explicit ratings
+- **Creature Generator**: Specialized node for cyborgs, robots, monsters with 300+ unique tags
 
 ## Installation
 
@@ -29,7 +30,7 @@ A custom node pack for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that
 
 3. Restart ComfyUI
 
-4. Find the nodes under **Animagine > Prompting** in the node menu
+4. Find the nodes under **Animagine > Prompting** and **Animagine > Creatures** in the node menu
 
 ## Nodes
 
@@ -59,6 +60,49 @@ The full-featured node with structured inputs for optimal prompt generation.
 **Outputs:**
 - `positive_prompt` - Fully optimized positive prompt
 - `negative_prompt` - Official Cagliostro negative prompt
+
+### Animagine XL 4.0 Character Factory (Expert)
+
+The ultimate builder node for constructing detailed characters and scenes without manual tagging.
+
+**Features:**
+- **Character Traits**: Dropdowns for hair style, length, color, eye color, expression, and skin type.
+- **Detailed Attire**: Massive selection of costumes (school uniform, maid, armor, etc.) + custom field.
+- **Scene Builder**: Dedicated controls for Location (Indoor/Outdoor), Time of Day, Weather, and Lighting.
+- **Smart Assembly**: Automatically combines all elements into the strict Animagine XL 4.0 tag order.
+
+| Input Category | Available Options |
+|----------------|-------------------|
+| **Character** | Gender, Hair (Style/Color/Length), Eyes, Skin, Expression |
+| **Attire** | 40+ presets (Uniforms, Fantasy, Casual) + Custom input |
+| **Scene** | Indoor/Outdoor locations, Time, Weather, Lighting |
+| **Style** | Artist tag, Art Style, Year Style, Rating |
+| **Meta** | Character Name, Series Name |
+
+### Animagine XL 4.0 Creature Styler (Cyborg/Robot/Monster)
+
+A specialized node for generating cyborgs, robots, monsters, and other creatures with unique visual aesthetics.
+
+**Features:**
+- **Creature Types**: 40+ creature options including cyborg, android, robot, mecha, gynoid, monster girl/boy, demon, succubus, angel, vampire, zombie, werewolf, ghost, alien, slime, dragon, lamia, harpy, eldritch/lovecraftian, golem, elemental
+- **Mechanical Features**: Mechanical limbs, cyber eyes, exposed machinery, chrome body, LED lights, holographic displays, energy cores, weapon systems, damaged/rusted metal, neon accents
+- **Monster Features**: Horns, wings (demon/angel/bat/insect), tails, claws, fangs, tentacles, scales, fur, multiple eyes/arms, auras, halos, unusual skin colors
+- **Visual Styles**: Cyberpunk, synthwave, vaporwave, neon glow, holographic, glitch art, dark fantasy, gothic, eldritch, bioluminescent, celestial, steampunk, dieselpunk, biomechanical, post-apocalyptic
+- **Creature Environments**: Cyberpunk city, space station, server room, junkyard, haunted mansion, hell/underworld, enchanted forest, floating islands, wasteland
+- **Creature Attire**: Power armor, exosuit, plugsuit, space suit, dark armor, bone armor, eldritch robes, gothic dress
+- **Weapons/Accessories**: Energy swords, laser guns, plasma rifles, scythes, magic staffs, grimoires, masks, visors, cloaks
+- **Dynamic Poses**: Fighting stance, attacking, transformation, feeding, flying, roaring, channeling energy, powering up
+
+| Input Category | Options Count |
+|----------------|---------------|
+| **Creature Types** | 40+ |
+| **Mechanical Features** | 45+ |
+| **Monster Features** | 55+ |
+| **Visual Styles** | 80+ |
+| **Environments** | 50+ |
+| **Attire** | 40+ |
+| **Weapons/Accessories** | 45+ |
+| **Poses** | 35+ |
 
 ### Animagine XL 4.0 Prompt Manager (Simple)
 
