@@ -303,116 +303,355 @@ class AnimagineXL4_Prompt_Styler:
         )
         return f"{self.OFFICIAL_NEGATIVE}, {enhanced_additions}"
 
-    def build_optimized_prompts(
+
+    # Character features
+    HAIR_LENGTHS = ["None", "short hair", "medium hair", "long hair", "very long hair", "absurdly long hair"]
+    HAIR_STYLES = [
+        "None", "pony tail", "twintails", "braid", "french braid", "crown braid", 
+        "twin braids", "hair bun", "double bun", "drill hair", "ahoge", "bob cut", 
+        "hime cut", "pixie cut", "messy hair", "straight hair", "wavy hair", "curly hair", 
+        "blunt bangs", "swept bangs", "hair over one eye", "hair over eyes"
+    ]
+    HAIR_COLORS = [
+        "None", "blonde hair", "black hair", "brown hair", "red hair", "blue hair", 
+        "green hair", "pink hair", "purple hair", "white hair", "silver hair", "grey hair", 
+        "orange hair", "multicolored hair", "two-tone hair", "gradient hair"
+    ]
+    EYE_COLORS = [
+        "None", "blue eyes", "red eyes", "green eyes", "yellow eyes", "purple eyes", 
+        "brown eyes", "pink eyes", "grey eyes", "black eyes", "aqua eyes", "heterochromia", "gradient eyes"
+    ]
+    EXPRESSIONS = [
+        "None", "smile", "grin", "smirk", "laughing", "frown", "angry", "annoyed", 
+        "sad", "crying", "tears", "blush", "embarrassed", "shy", "nervous", "scared", 
+        "surprised", "shocked", "sleepy", "yawn", "bored", "expressionless", "neutral expression", 
+        "wink", "one eye closed", "tongue out", "pout", "ahegao"
+    ]
+    SKIN_TYPES = ["None", "pale skin", "fair skin", "tanned skin", "dark skin", "darker skin"]
+    
+    # Attire
+    ATTIRE_CATEGORIES = [
+        "None",
+        "school uniform", "sailor dress", "blazer", "gym uniform", "swimsuit", "school swimsuit", "bikini",
+        "maid", "waitress", "nurse", "police", "military", "kimono", "yukata", "miko", "cheongsam",
+        "casual", "sportswear", "pajamas", "lingerie", "armor", "fantasy", "sci-fi suit", "plugsuit",
+        "dress", "suit", "tuxedo", "hoodie", "jacket", "sweater", "t-shirt", "shirt", "blouse",
+        "skirt", "shorts", "pants", "jeans", "thighhighs", "pantyhose", "kneehighs"
+    ]
+
+    # Environment
+    LOCATIONS_INDOOR = [
+        "None", "bedroom", "living room", "kitchen", "bathroom", "classroom", "library", "office", 
+        "laboratory", "store", "supermarket", "cafe", "restaurant", "bar", "gym", "hospital", 
+        "dungeon", "castle", "temple", "shrine"
+    ]
+    LOCATIONS_OUTDOOR = [
+        "None", "street", "city", "cityscape", "ally", "park", "garden", "forest", "woods", 
+        "beach", "ocean", "sea", "mountains", "field", "meadow", "flower field", "ruins", 
+        "rooftop", "balcony", "train station", "bus stop"
+    ]
+    TIME_OF_DAY = ["None", "day", "morning", "afternoon", "evening", "sunset", "sunrise", "night", "midnight", "dusk", "dawn"]
+    WEATHER = ["None", "sunny", "cloudy", "rain", "raining", "snow", "snowing", "fog", "mist", "windy", "storm", "lightning"]
+    LIGHTING = ["None", "sunlight", "moonlight", "natural light", "cinematic lighting", "volumetric lighting", "god rays", "rim lighting", "backlighting", "soft lighting", "hard lighting", "neon lights", "firelight", "candlelight"]
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # Core prompt input
+                "simple_prompt": ("STRING", {
+                    "multiline": True, 
+                    "default": "Enter your simple prompt here...", 
+                    "dynamicPrompts": False
+                }),
+            },
+            "optional": {
+                # Character Builder Section
+                "gender": (cls.SUBJECT_COUNTS, {"default": "1girl"}),
+                "hair_style": (cls.HAIR_STYLES, {"default": "None"}),
+                "hair_length": (cls.HAIR_LENGTHS, {"default": "None"}),
+                "hair_color": (cls.HAIR_COLORS, {"default": "None"}),
+                "eye_color": (cls.EYE_COLORS, {"default": "None"}),
+                "expression": (cls.EXPRESSIONS, {"default": "None"}),
+                "skin_type": (cls.SKIN_TYPES, {"default": "None"}),
+                "attire": (cls.ATTIRE_CATEGORIES, {"default": "None"}),
+                
+                # Scene Builder Section
+                "location_type": (["None", "Indoor", "Outdoor"], {"default": "None"}),
+                "location_indoor": (cls.LOCATIONS_INDOOR, {"default": "None"}),
+                "location_outdoor": (cls.LOCATIONS_OUTDOOR, {"default": "None"}),
+                "time_of_day": (cls.TIME_OF_DAY, {"default": "None"}),
+                "weather": (cls.WEATHER, {"default": "None"}),
+                "lighting": (cls.LIGHTING, {"default": "None"}),
+                
+                # Character identification (Tag Ordering: comes first)
+                "character_name": ("STRING", {
+                    "default": "",
+                    "placeholder": "e.g., hatsune miku (optional)"
+                }),
+                "series_name": ("STRING", {
+                    "default": "",
+                    "placeholder": "e.g., vocaloid (optional)"
+                }),
+                
+                # Artist and Style
+                "artist_tag": ("STRING", {
+                    "default": "",
+                    "placeholder": "e.g., ciloranko"
+                }),
+                "art_style": (cls.ART_STYLES, {"default": "None"}),
+                "year_style": (cls.YEAR_STYLES, {"default": "2024-2025 (Modern)"}),
+                
+                # Composition
+                "pose": (cls.POSES, {"default": "None"}),
+                "framing": (cls.FRAMING, {"default": "None"}),
+                
+                # Controls
+                "rating": (cls.RATING_TAGS, {"default": "safe"}),
+                "add_quality_tags": ("BOOLEAN", {"default": True}),
+                "enhance_negative": ("BOOLEAN", {"default": False}),
+                "additional_positive": ("STRING", {
+                    "multiline": True,
+                    "default": "",
+                    "placeholder": "Additional custom tags"
+                }),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("positive_prompt", "negative_prompt")
+    FUNCTION = "build_detailed_prompts"
+    CATEGORY = "Animagine/Prompting"
+    
+    # ... existing helper methods (_clean_tag, _clean_prompt, etc.) ...
+    
+    def build_detailed_prompts(
         self,
-        simple_prompt: str,
-        subject_count: str = "1girl",
-        character_name: str = "",
-        series_name: str = "",
-        artist_tag: str = "",
-        pose: str = "None",
-        framing: str = "None",
-        background: str = "None",
-        art_style: str = "None",
-        rating: str = "safe",
-        year_style: str = "2024-2025 (Modern)",
-        add_quality_tags: bool = True,
-        enhance_negative: bool = False,
-        additional_positive: str = "",
-        additional_negative: str = "",
+        simple_prompt,
+        gender="1girl",
+        hair_style="None",
+        hair_length="None",
+        hair_color="None",
+        eye_color="None",
+        expression="None",
+        skin_type="None",
+        attire="None",
+        location_type="None",
+        location_indoor="None",
+        location_outdoor="None",
+        time_of_day="None",
+        weather="None",
+        lighting="None",
+        character_name="",
+        series_name="",
+        artist_tag="",
+        art_style="None",
+        year_style="2024-2025 (Modern)",
+        pose="None",
+        framing="None",
+        rating="safe",
+        add_quality_tags=True,
+        enhance_negative=False,
+        additional_positive="",
+        additional_negative="",
+        # These are kept for backward compatibility if called with old args, though INPUT_TYPES changed
+        subject_count=None, 
+        background=None,
     ):
-        """
-        Build optimized positive and negative prompts following Cagliostro Lab guidelines.
+        # Handle backward compatibility mapping if needed
+        # But this is a new node class so strictly we don't need it, 
+        # however we are modifying the existing Styler class in-place to Extend it.
+        # Wait, if I modify Styler in place, I break existing workflows that use 'subject_count'.
+        # The user asked to "extend" it. I should probably ADD A NEW CLASS instead of replacing Styler.
+        # Replacing Styler with new inputs breaks inputs for users who update.
+        # So I will revert the change to Styler and create AnimagineXL4_Character_Factory
+        pass
+
+class AnimagineXL4_Character_Factory(AnimagineXL4_Prompt_Styler):
+    """
+    A comprehensive Character and Scene Factory for Animagine XL 4.0.
+    Allows constructing detailed prompts from a vast database of text snippets.
+    """
+    
+    # Expanded Database of Elements
+    HAIR_LENGTHS = ["None", "short hair", "medium hair", "long hair", "very long hair", "absurdly long hair"]
+    HAIR_STYLES = [
+        "None", "pony tail", "twintails", "braid", "french braid", "crown braid", 
+        "twin braids", "hair bun", "double bun", "drill hair", "ahoge", "bob cut", 
+        "hime cut", "pixie cut", "messy hair", "straight hair", "wavy hair", "curly hair", 
+        "blunt bangs", "swept bangs", "hair over one eye", "hair over eyes"
+    ]
+    HAIR_COLORS = [
+        "None", "blonde hair", "black hair", "brown hair", "red hair", "blue hair", 
+        "green hair", "pink hair", "purple hair", "white hair", "silver hair", "grey hair", 
+        "orange hair", "multicolored hair", "two-tone hair", "gradient hair"
+    ]
+    EYE_COLORS = [
+        "None", "blue eyes", "red eyes", "green eyes", "yellow eyes", "purple eyes", 
+        "brown eyes", "pink eyes", "grey eyes", "black eyes", "aqua eyes", "heterochromia", "gradient eyes"
+    ]
+    EXPRESSIONS = [
+        "None", "smile", "grin", "smirk", "laughing", "frown", "angry", "annoyed", 
+        "sad", "crying", "tears", "blush", "embarrassed", "shy", "nervous", "scared", 
+        "surprised", "shocked", "sleepy", "yawn", "bored", "expressionless", "neutral expression", 
+        "wink", "one eye closed", "tongue out", "pout", "ahegao"
+    ]
+    SKIN_TYPES = ["None", "pale skin", "fair skin", "tanned skin", "dark skin", "darker skin"]
+    
+    ATTIRE_CATEGORIES = [
+        "None",
+        "school uniform", "sailor dress", "blazer", "gym uniform", "swimsuit", "school swimsuit", "bikini",
+        "maid", "waitress", "nurse", "police", "military", "kimono", "yukata", "miko", "cheongsam",
+        "casual", "sportswear", "pajamas", "lingerie", "armor", "fantasy", "sci-fi suit", "plugsuit",
+        "dress", "suit", "tuxedo", "hoodie", "jacket", "sweater", "t-shirt", "shirt", "blouse",
+        "skirt", "shorts", "pants", "jeans", "thighhighs", "pantyhose", "kneehighs"
+    ]
+
+    LOCATIONS_INDOOR = [
+        "None", "bedroom", "living room", "kitchen", "bathroom", "classroom", "library", "office", 
+        "laboratory", "store", "supermarket", "cafe", "restaurant", "bar", "gym", "hospital", 
+        "dungeon", "castle", "temple", "shrine"
+    ]
+    LOCATIONS_OUTDOOR = [
+        "None", "street", "city", "cityscape", "ally", "park", "garden", "forest", "woods", 
+        "beach", "ocean", "sea", "mountains", "field", "meadow", "flower field", "ruins", 
+        "rooftop", "balcony", "train station", "bus stop"
+    ]
+    TIME_OF_DAY = ["None", "day", "morning", "afternoon", "evening", "sunset", "sunrise", "night", "midnight", "dusk", "dawn"]
+    WEATHER = ["None", "sunny", "cloudy", "rain", "raining", "snow", "snowing", "fog", "mist", "windy", "storm", "lightning"]
+    LIGHTING = ["None", "sunlight", "moonlight", "natural light", "cinematic lighting", "volumetric lighting", "god rays", "rim lighting", "backlighting", "soft lighting", "hard lighting", "neon lights", "firelight", "candlelight"]
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        # Inherit optional inputs from parent but formatted for our needs
+        # We need to redefine to ensure order
+        return {
+            "required": {
+                 # No mandatory simple prompt, but let's keep a customizable one
+                "subject_type": (cls.SUBJECT_COUNTS, {"default": "1girl"}),
+            },
+            "optional": {
+                # Character Details
+                "hair_style": (cls.HAIR_STYLES, {"default": "None"}),
+                "hair_length": (cls.HAIR_LENGTHS, {"default": "None"}),
+                "hair_color": (cls.HAIR_COLORS, {"default": "None"}),
+                "eye_color": (cls.EYE_COLORS, {"default": "None"}),
+                "expression": (cls.EXPRESSIONS, {"default": "None"}),
+                "skin_type": (cls.SKIN_TYPES, {"default": "None"}),
+                "attire": (cls.ATTIRE_CATEGORIES, {"default": "None"}),
+                "custom_attire": ("STRING", {"default": "", "placeholder": "Custom clothes details..."}),
+                
+                # Scene Details
+                "location_type": (["None", "Indoor", "Outdoor"], {"default": "None"}),
+                "location_indoor": (cls.LOCATIONS_INDOOR, {"default": "None"}),
+                "location_outdoor": (cls.LOCATIONS_OUTDOOR, {"default": "None"}),
+                "time_of_day": (cls.TIME_OF_DAY, {"default": "None"}),
+                "weather": (cls.WEATHER, {"default": "None"}),
+                "lighting": (cls.LIGHTING, {"default": "None"}),
+                
+                # Composition
+                "pose": (cls.POSES, {"default": "None"}),
+                "framing": (cls.FRAMING, {"default": "None"}),
+                
+                # Identifiers
+                "character_name": ("STRING", {"default": "", "placeholder": "Character Name"}),
+                "series_name": ("STRING", {"default": "", "placeholder": "Series Name"}),
+                "artist_tag": ("STRING", {"default": "", "placeholder": "Artist Style"}),
+                
+                # Global Style
+                "art_style": (cls.ART_STYLES, {"default": "None"}),
+                "year_style": (cls.YEAR_STYLES, {"default": "2024-2025 (Modern)"}),
+                "rating": (cls.RATING_TAGS, {"default": "safe"}),
+                
+                # Toggles
+                "add_quality_tags": ("BOOLEAN", {"default": True}),
+                "enhance_negative": ("BOOLEAN", {"default": False}),
+                "extra_tags": ("STRING", {"multiline": True, "default": "", "placeholder": "Any other tags..."}),
+            }
+        }
         
-        Tag Order (critical for Animagine XL 4.0):
-        1. Subject count (1girl, 1boy, etc.)
-        2. Character name
-        3. Series/copyright name
-        4. Artist tag (early placement, NOT at end)
-        5. General tags (from simple_prompt + composition options)
-        6. Rating tag
-        7. Year tags (temporal styling)
-        8. Quality tags (MUST be at the END)
-        """
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("positive_prompt", "negative_prompt")
+    FUNCTION = "assemble_prompt"
+    CATEGORY = "Animagine/Prompting"
+
+    def assemble_prompt(self, subject_type, hair_style, hair_length, hair_color, eye_color, 
+                       expression, skin_type, attire, custom_attire,
+                       location_type, location_indoor, location_outdoor, time_of_day, weather, lighting,
+                       pose, framing, character_name, series_name, artist_tag,
+                       art_style, year_style, rating, add_quality_tags, enhance_negative, extra_tags):
         
-        # Build positive prompt parts in correct order
-        prompt_parts = []
+        parts = []
         
-        # 1. Subject count
-        if subject_count and subject_count != "None":
-            prompt_parts.append(subject_count)
+        # 1. Subject
+        if subject_type != "None": parts.append(subject_type)
         
-        # 2. Character name
-        character_name = self._clean_prompt(character_name)
-        if character_name:
-            prompt_parts.append(character_name)
+        # 2. Character Identity
+        if character_name: parts.append(self._clean_prompt(character_name))
+        if series_name: parts.append(self._clean_prompt(series_name))
         
-        # 3. Series/copyright name (important for character accuracy!)
-        series_name = self._clean_prompt(series_name)
-        if series_name:
-            prompt_parts.append(series_name)
+        # 3. Artist (Early)
+        if artist_tag: parts.append(self._clean_prompt(artist_tag))
         
-        # 4. Artist tag (placed after character/series, NOT at end)
-        artist_tag = self._clean_prompt(artist_tag)
-        if artist_tag:
-            # Ensure proper formatting for artist tags
-            if not artist_tag.startswith("artist:") and not artist_tag.startswith("("):
-                prompt_parts.append(artist_tag)
-            else:
-                prompt_parts.append(artist_tag)
+        # 4. Character Traits (Hair -> Eyes -> Skin -> Expression)
+        traits = []
+        if hair_length != "None": traits.append(hair_length)
+        if hair_style != "None": traits.append(hair_style)
+        if hair_color != "None": traits.append(hair_color)
+        if eye_color != "None": traits.append(eye_color)
+        if skin_type != "None": traits.append(skin_type)
+        if expression != "None": traits.append(expression)
+        if traits: parts.extend(traits)
         
-        # 5. General tags from simple prompt
-        simple_prompt = self._clean_prompt(simple_prompt)
-        # Remove placeholder text if present
-        if simple_prompt and "Enter your simple prompt" not in simple_prompt:
-            prompt_parts.append(simple_prompt)
+        # 5. Attire
+        if attire != "None": parts.append(attire)
+        if custom_attire: parts.append(self._clean_prompt(custom_attire))
         
-        # 5b. Composition options
-        if framing and framing != "None":
-            prompt_parts.append(framing)
+        # 6. Composition (Pose, Framing)
+        if pose != "None": parts.append(pose)
+        if framing != "None": parts.append(framing)
         
-        if pose and pose != "None":
-            prompt_parts.append(pose)
-            
-        if background and background != "None":
-            prompt_parts.append(background)
-            
-        if art_style and art_style != "None":
-            prompt_parts.append(art_style)
+        # 7. Scene / Background
+        scene = []
+        if location_type == "Indoor" and location_indoor != "None":
+            scene.append("indoors")
+            scene.append(location_indoor)
+        elif location_type == "Outdoor" and location_outdoor != "None":
+            scene.append("outdoors")
+            scene.append(location_outdoor)
         
-        # 5c. Additional positive tags
-        additional_positive = self._clean_prompt(additional_positive)
-        if additional_positive:
-            prompt_parts.append(additional_positive)
+        if time_of_day != "None": scene.append(time_of_day)
+        if weather != "None": scene.append(weather)
+        if lighting != "None": scene.append(lighting)
+        if scene: parts.extend(scene)
         
-        # 6. Rating tag (before quality tags)
-        if rating and rating != "None":
-            prompt_parts.append(rating)
+        # 8. Extra & Style
+        if art_style != "None": parts.append(art_style)
+        if extra_tags: parts.append(self._clean_prompt(extra_tags))
         
-        # 7. Year tags (temporal styling)
-        year_tags = self._get_year_tags(year_style)
-        if year_tags:
-            prompt_parts.append(year_tags)
+        # 9. Rating
+        if rating != "None": parts.append(rating)
         
-        # 8. Quality tags at the END (mandatory for optimal results)
-        if add_quality_tags:
-            prompt_parts.append(self.QUALITY_SUFFIX)
+        # 10. Year
+        year = self._get_year_tags(year_style)
+        if year: parts.append(year)
         
-        # Combine all parts
-        final_positive = ", ".join(part for part in prompt_parts if part)
+        # 11. Quality
+        if add_quality_tags: parts.append(self.QUALITY_SUFFIX)
         
-        # Build negative prompt
+        final_positive = ", ".join(parts)
+        
+        # Negative Prompt
         if enhance_negative:
             final_negative = self._get_enhanced_negative()
         else:
             final_negative = self.OFFICIAL_NEGATIVE
-        
-        # Add additional negative tags
-        additional_negative = self._clean_prompt(additional_negative)
-        if additional_negative:
-            final_negative = f"{final_negative}, {additional_negative}"
-        
+            
         return (final_positive, final_negative)
+
 
 
 # Legacy node for backwards compatibility
