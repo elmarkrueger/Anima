@@ -14,6 +14,46 @@ Tag Ordering Method (critical for optimal results):
 7. Quality tags at the END (masterpiece, high score, great score, absurdres)
 """
 
+import csv
+import os
+
+
+def load_characters_csv():
+    """Load character data from CSV file and return unique lists."""
+    csv_path = os.path.join(os.path.dirname(__file__), "characters.csv")
+    character_names = ["None"]
+    series_names = ["None"]
+    artist_tags = ["None"]
+    
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            seen_characters = set()
+            seen_series = set()
+            seen_artists = set()
+            
+            for row in reader:
+                char = row.get('character_name', '').strip()
+                series = row.get('series_name', '').strip()
+                artist = row.get('artist_tag', '').strip()
+                
+                if char and char not in seen_characters:
+                    character_names.append(char)
+                    seen_characters.add(char)
+                if series and series not in seen_series:
+                    series_names.append(series)
+                    seen_series.add(series)
+                if artist and artist not in seen_artists:
+                    artist_tags.append(artist)
+                    seen_artists.add(artist)
+    except Exception as e:
+        print(f"[Animagine] Warning: Could not load characters.csv: {e}")
+    
+    return character_names, series_names, artist_tags
+
+# Load CSV data at module level
+CHARACTER_NAMES_LIST, SERIES_NAMES_LIST, ARTIST_TAGS_LIST = load_characters_csv()
+
 
 class AnimagineXL4_Prompt_Styler:
     """
@@ -563,9 +603,9 @@ class AnimagineXL4_Character_Factory(AnimagineXL4_Prompt_Styler):
                 "framing": (cls.FRAMING, {"default": "None"}),
                 
                 # Identifiers
-                "character_name": ("STRING", {"default": "", "placeholder": "Character Name"}),
-                "series_name": ("STRING", {"default": "", "placeholder": "Series Name"}),
-                "artist_tag": ("STRING", {"default": "", "placeholder": "Artist Style"}),
+                "character_name": (CHARACTER_NAMES_LIST, {"default": "None"}),
+                "series_name": (SERIES_NAMES_LIST, {"default": "None"}),
+                "artist_tag": (ARTIST_TAGS_LIST, {"default": "None"}),
                 
                 # Global Style
                 "art_style": (cls.ART_STYLES, {"default": "None"}),
@@ -596,11 +636,11 @@ class AnimagineXL4_Character_Factory(AnimagineXL4_Prompt_Styler):
         if subject_type != "None": parts.append(subject_type)
         
         # 2. Character Identity
-        if character_name: parts.append(self._clean_prompt(character_name))
-        if series_name: parts.append(self._clean_prompt(series_name))
+        if character_name and character_name != "None": parts.append(self._clean_prompt(character_name))
+        if series_name and series_name != "None": parts.append(self._clean_prompt(series_name))
         
         # 3. Artist (Early)
-        if artist_tag: parts.append(self._clean_prompt(artist_tag))
+        if artist_tag and artist_tag != "None": parts.append(self._clean_prompt(artist_tag))
         
         # 4. Character Traits (Hair -> Eyes -> Skin -> Expression)
         traits = []
