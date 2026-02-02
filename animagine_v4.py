@@ -24,6 +24,75 @@ class AnimagineXL4_Prompt_Styler:
     # --- CONSTANTS FROM CAGLIOSTRO LAB GUIDELINES ---
     QUALITY_SUFFIX = "masterpiece, high score, great score, absurdres"
     
+    # --- CHARACTER PRESETS DATABASE ---
+    CHARACTER_PRESETS = [
+        "None",
+        "Son Goku (Dragon Ball)",
+        "Monkey D. Luffy (One Piece)",
+        "Naruto Uzumaki (Naruto)",
+        "Sailor Moon (Sailor Moon)",
+        "Levi Ackerman (Attack on Titan)",
+        "Edward Elric (Fullmetal Alchemist)",
+        "Guts (Berserk)",
+        "Spike Spiegel (Cowboy Bebop)",
+        "L Lawliet (Death Note)",
+        "Satoru Gojo (Jujutsu Kaisen)",
+        "Saitama (One Punch Man)",
+        "Jotaro Kujo (JoJo's Bizarre Adventure)",
+        "Rei Ayanami (Neon Genesis Evangelion)",
+        "Tanjiro Kamado (Demon Slayer)",
+        "Lelouch Lamperouge (Code Geass)",
+        "Pikachu (Pokemon)",
+        "Killua Zoldyck (Hunter x Hunter)",
+        "Rem (Re:Zero)",
+        "Makima (Chainsaw Man)",
+        "Astro Boy (Astro Boy)",
+        "Yor Forger (Spy x Family)",
+        "Sakata Gintoki (Gintama)",
+        "Totoro (My Neighbor Totoro)",
+        "Motoko Kusanagi (Ghost in the Shell)",
+        "Roronoa Zoro (One Piece)",
+        "Vegeta (Dragon Ball)",
+        "Sakura Kinomoto (Cardcaptor Sakura)",
+        "Eren Yeager (Attack on Titan)",
+        "Violet Evergarden (Violet Evergarden)",
+        "Frieren (Frieren: Beyond Journey's End)",
+    ]
+    
+    # Mapping: preset name -> (character_name, series_name, artist_tag)
+    CHARACTER_DATA = {
+        "Son Goku (Dragon Ball)": ("Son Goku", "Dragon Ball", "toriyama_akira"),
+        "Monkey D. Luffy (One Piece)": ("Monkey D. Luffy", "One Piece", "oda_eiichiro"),
+        "Naruto Uzumaki (Naruto)": ("Naruto Uzumaki", "Naruto", "kishimoto_masashi"),
+        "Sailor Moon (Sailor Moon)": ("Sailor Moon (Usagi Tsukino)", "Sailor Moon", "takeuchi_naoko"),
+        "Levi Ackerman (Attack on Titan)": ("Levi Ackerman", "Attack on Titan", "isayama_hajime"),
+        "Edward Elric (Fullmetal Alchemist)": ("Edward Elric", "Fullmetal Alchemist", "arakawa_hiromu"),
+        "Guts (Berserk)": ("Guts", "Berserk", "miura_kentarou"),
+        "Spike Spiegel (Cowboy Bebop)": ("Spike Spiegel", "Cowboy Bebop", "kawamoto_toshihiro"),
+        "L Lawliet (Death Note)": ("L Lawliet", "Death Note", "obata_takeshi"),
+        "Satoru Gojo (Jujutsu Kaisen)": ("Satoru Gojo", "Jujutsu Kaisen", "akutami_gege"),
+        "Saitama (One Punch Man)": ("Saitama", "One Punch Man", "murata_yusuke"),
+        "Jotaro Kujo (JoJo's Bizarre Adventure)": ("Jotaro Kujo", "JoJo's Bizarre Adventure", "araki_hirohiko"),
+        "Rei Ayanami (Neon Genesis Evangelion)": ("Rei Ayanami", "Neon Genesis Evangelion", "sadamoto_yoshiyuki"),
+        "Tanjiro Kamado (Demon Slayer)": ("Tanjiro Kamado", "Demon Slayer (Kimetsu no Yaiba)", "gotouge_koyoharu"),
+        "Lelouch Lamperouge (Code Geass)": ("Lelouch Lamperouge", "Code Geass", "clamp"),
+        "Pikachu (Pokemon)": ("Pikachu", "Pokemon", "sugimori_ken"),
+        "Killua Zoldyck (Hunter x Hunter)": ("Killua Zoldyck", "Hunter x Hunter", "togashi_yoshihiro"),
+        "Rem (Re:Zero)": ("Rem", "Re:Zero - Starting Life in Another World", "ootsuka_shinichirou"),
+        "Makima (Chainsaw Man)": ("Makima", "Chainsaw Man", "fujimoto_tatsuki"),
+        "Astro Boy (Astro Boy)": ("Astro Boy", "Astro Boy", "tezuka_osamu"),
+        "Yor Forger (Spy x Family)": ("Yor Forger", "Spy x Family", "endou_tatsuya"),
+        "Sakata Gintoki (Gintama)": ("Sakata Gintoki", "Gintama", "sorachi_hideaki"),
+        "Totoro (My Neighbor Totoro)": ("Totoro", "My Neighbor Totoro", "miyazaki_hayao"),
+        "Motoko Kusanagi (Ghost in the Shell)": ("Motoko Kusanagi", "Ghost in the Shell", "shirow_masamune"),
+        "Roronoa Zoro (One Piece)": ("Roronoa Zoro", "One Piece", "oda_eiichiro"),
+        "Vegeta (Dragon Ball)": ("Vegeta", "Dragon Ball", "toriyama_akira"),
+        "Sakura Kinomoto (Cardcaptor Sakura)": ("Sakura Kinomoto", "Cardcaptor Sakura", "clamp"),
+        "Eren Yeager (Attack on Titan)": ("Eren Yeager", "Attack on Titan", "isayama_hajime"),
+        "Violet Evergarden (Violet Evergarden)": ("Violet Evergarden", "Violet Evergarden", "takase_akiko"),
+        "Frieren (Frieren: Beyond Journey's End)": ("Frieren", "Frieren: Beyond Journey's End", "abe_tsukasa"),
+    }
+    
     OFFICIAL_NEGATIVE = (
         "lowres, bad anatomy, bad hands, text, error, missing finger, "
         "extra digits, fewer digits, cropped, worst quality, low quality, "
@@ -208,21 +277,26 @@ class AnimagineXL4_Prompt_Styler:
                 }),
             },
             "optional": {
+                # Character Preset (Quick Select)
+                "character_preset": (cls.CHARACTER_PRESETS, {
+                    "default": "None",
+                }),
+                
                 # Character identification (Tag Ordering: comes first)
                 "subject_count": (cls.SUBJECT_COUNTS, {"default": "1girl"}),
                 "character_name": ("STRING", {
                     "default": "",
-                    "placeholder": "e.g., hatsune miku, shiroko (blue archive)"
+                    "placeholder": "e.g., hatsune miku (overrides preset)"
                 }),
                 "series_name": ("STRING", {
                     "default": "",
-                    "placeholder": "e.g., vocaloid, blue archive (IMPORTANT for characters!)"
+                    "placeholder": "e.g., vocaloid (overrides preset)"
                 }),
                 
                 # Artist styling (placed after character/series, NOT at end)
                 "artist_tag": ("STRING", {
                     "default": "",
-                    "placeholder": "e.g., ciloranko, wlop, sakimichan"
+                    "placeholder": "e.g., ciloranko (overrides preset)"
                 }),
                 
                 # Composition helpers
@@ -306,6 +380,7 @@ class AnimagineXL4_Prompt_Styler:
     def build_optimized_prompts(
         self,
         simple_prompt,
+        character_preset="None",
         subject_count="1girl",
         character_name="",
         series_name="",
@@ -324,21 +399,35 @@ class AnimagineXL4_Prompt_Styler:
         """Build optimized prompts following Cagliostro Lab tag ordering."""
         parts = []
         
+        # Resolve character preset (manual inputs override preset)
+        final_character_name = character_name
+        final_series_name = series_name
+        final_artist_tag = artist_tag
+        
+        if character_preset != "None" and character_preset in self.CHARACTER_DATA:
+            preset_char, preset_series, preset_artist = self.CHARACTER_DATA[character_preset]
+            if not final_character_name:
+                final_character_name = preset_char
+            if not final_series_name:
+                final_series_name = preset_series
+            if not final_artist_tag:
+                final_artist_tag = preset_artist
+        
         # 1. Subject count
         if subject_count != "None":
             parts.append(subject_count)
         
         # 2. Character name
-        if character_name:
-            parts.append(self._clean_prompt(character_name))
+        if final_character_name:
+            parts.append(self._clean_prompt(final_character_name))
         
         # 3. Series name
-        if series_name:
-            parts.append(self._clean_prompt(series_name))
+        if final_series_name:
+            parts.append(self._clean_prompt(final_series_name))
         
         # 4. Artist tag (early position)
-        if artist_tag:
-            parts.append(self._clean_prompt(artist_tag))
+        if final_artist_tag:
+            parts.append(self._clean_prompt(final_artist_tag))
         
         # 5. General tags (user prompt)
         if simple_prompt:
