@@ -32,6 +32,19 @@ A custom node pack for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) that
 
 4. Find the nodes under **Animagine > Prompting** and **Animagine > Creatures** in the node menu
 
+## File Structure
+
+```
+Anima/
+├── __init__.py              # Node registration & web directory config
+├── animagine_v4.py          # Main node classes
+├── characters.csv           # Character database (editable)
+├── web/
+│   └── js/
+│       └── animagine_autofill.js  # Auto-fill extension
+└── ...
+```
+
 ## Nodes
 
 ### Animagine XL 4.0 Prompt Styler (Advanced)
@@ -70,14 +83,16 @@ The ultimate builder node for constructing detailed characters and scenes withou
 - **Detailed Attire**: Massive selection of costumes (school uniform, maid, armor, etc.) + custom field.
 - **Scene Builder**: Dedicated controls for Location (Indoor/Outdoor), Time of Day, Weather, and Lighting.
 - **Smart Assembly**: Automatically combines all elements into the strict Animagine XL 4.0 tag order.
+- **Character Database**: Dropdown selectors for Character Name, Series Name, and Artist Tag loaded from `characters.csv`
+- **Auto-Fill**: When selecting a character, series and artist are automatically populated!
 
 | Input Category | Available Options |
 |----------------|-------------------|
 | **Character** | Gender, Hair (Style/Color/Length), Eyes, Skin, Expression |
 | **Attire** | 40+ presets (Uniforms, Fantasy, Casual) + Custom input |
 | **Scene** | Indoor/Outdoor locations, Time, Weather, Lighting |
-| **Style** | Artist tag, Art Style, Year Style, Rating |
-| **Meta** | Character Name, Series Name |
+| **Style** | Artist tag dropdown, Art Style, Year Style, Rating |
+| **Identity** | Character Name dropdown (30+ characters), Series Name dropdown (22+ series) |
 
 ### Animagine XL 4.0 Creature Styler (Cyborg/Robot/Monster)
 
@@ -162,6 +177,23 @@ The model supports temporal tags to emulate different anime art eras:
 | Classic | 2010-2014 | Early HD anime style |
 | Retro | 2005-2009 | Mid-2000s aesthetic, cell shading |
 | Early Digital | 2000-2004 | Early digital anime art |
+
+## Customizing the Character Database
+
+You can add your own characters by editing `characters.csv`:
+
+```csv
+character_name,series_name,artist_tag
+Your Character,Your Series,artist_name
+```
+
+After editing, also update `web/js/animagine_autofill.js` to include the new character in the `CHARACTER_MAPPING` object for auto-fill to work:
+
+```javascript
+"Your Character": { series: "Your Series", artist: "artist_name" },
+```
+
+Then restart ComfyUI.
 
 ## References
 

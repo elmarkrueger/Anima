@@ -17,4 +17,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AnimagineXL4_Creature_Styler": "Animagine XL 4.0 Creature Styler (Cyborg/Robot/Monster)",
 }
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
+# Tell ComfyUI where to find web extensions
+WEB_DIRECTORY = "./web"
+
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']

@@ -4,6 +4,24 @@ All notable changes to ComfyUI Animagine XL 4.0 Prompt Styler will be documented
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.4.0] - 2026-02-02
+
+### Added
+- **Character Database Dropdowns**: Character Name, Series Name, and Artist Tag are now dropdown selectors in Character Factory
+  - Data loaded from `characters.csv` at startup
+  - 30+ pre-configured characters from popular anime/manga
+  - 22+ unique series
+  - 25+ artist tags
+- **Auto-Fill Feature**: Selecting a character automatically populates Series Name and Artist Tag
+  - Web extension located in `web/js/animagine_autofill.js`
+  - Smart detection: only auto-fills if fields are "None" or were previously auto-filled
+  - Won't overwrite manually selected values
+- **WEB_DIRECTORY**: Added web extension support in `__init__.py`
+
+### Changed
+- Character Factory inputs `character_name`, `series_name`, `artist_tag` changed from text fields to dropdown selectors
+- Updated `assemble_prompt` method to handle "None" selections from dropdowns
+
 ## [1.3.0] - 2026-02-01
 
 ### Added
@@ -81,6 +99,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 
 ## Upgrade Notes
+
+### From 1.3.0 to 1.4.0
+
+Character Factory now uses dropdown selectors instead of text inputs for character_name, series_name, and artist_tag.
+
+**Breaking Change**: If you had custom text in these fields, you'll need to either:
+1. Add your characters to `characters.csv` and restart ComfyUI
+2. Use the "extra_tags" field for custom character/series/artist entries
+
+**New Feature**: Character auto-fill! Select a character and series/artist populate automatically.
 
 ### From 1.2.0 to 1.3.0
 
